@@ -36,7 +36,7 @@ foreach ($parameter in $templateObject.parameters.psobject.properties) {
     if ($name -like "*password*" -or 
         $name -like "*secret*" -or
         $name -like "*accountkey*") {
-        # if it's not secure, flag it
+        # if it's not secure, warn about it
 
         if ($type -ne 'securestring' -and $type -ne 'secureobject') {
             #except certain patterns we know about in ARM
@@ -44,18 +44,8 @@ foreach ($parameter in $templateObject.parameters.psobject.properties) {
             # secret + Version (url or simply the version property of a secret)
             # secret + url
             # secret + name
-            if ($name -like "*secret*" -and
-                   ($name -like "*permission*" -or
-                    $name -like "*version*" -or
-                    $name -like "*url*" -or
-                    $name -like "*uri*" -or 
-                    $name -like "*name*")
-                )
             {
-                Write-Warning "Skipping parameter `"$name`""
-            }
-            else {
-                Write-Error -Message "Parameter `"$name`" is of type `"$type`" but should be secure." -ErrorId Password.Param.Not.Secure -TargetObject $parameter
+                Write-Warning -Message "Parameter `"$name`" is of type `"$type`" but might need to be secure." -TargetObject $parameter
             }      
         }
     }
